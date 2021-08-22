@@ -12,7 +12,7 @@ mod widget;
 
 use druid::AppLauncher;
 use env_logger::{Builder, Env};
-use webapi::WebApi;
+use webapi::{WebApi, LocalTrackManager};
 
 use crate::{
     data::{AppState, Config},
@@ -34,17 +34,22 @@ fn main() {
 
     let config = Config::load().unwrap_or_default();
     let state = AppState::default_with_config(config);
-
     WebApi::new(
         state.session.clone(),
         Config::proxy().as_deref(),
-        Config::cache_dir(),
-    )
-    .install_as_global();
+        Config::cache_dir()
+    ).install_as_global();
+
+    LocalTrackManager::new().install_as_global();
 
     let delegate;
     let launcher;
     if state.config.has_credentials() {
+        // If the user is logged in get their local tracks for the WebApi
+        let mut track_manager = LocalTrackManager::global().lock().unwrap();
+        track_manager.read_new_user(state.config.get_username().unwrap());
+        drop(track_manager);
+
         // Credentials are configured, open the main window.
         let window = ui::main_window();
         delegate = Delegate::with_main(window.id);

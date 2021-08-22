@@ -54,6 +54,10 @@ impl Credentials {
             auth_data: password.into_bytes(),
         }
     }
+
+    pub fn get_username(&self) -> String {
+        self.username.clone()
+    }
 }
 
 #[derive(Serialize, Deserialize)]

@@ -10,14 +10,9 @@ use druid::{
 };
 use psst_core::connection::Credentials;
 
-use crate::{
-    cmd,
-    controller::InputController,
-    data::{
+use crate::{cmd, controller::InputController, data::{
         AppState, AudioQuality, Authentication, Config, Preferences, PreferencesTab, Promise, Theme,
-    },
-    widget::{icons, Border, Empty, MyWidgetExt},
-};
+    }, webapi::WebApi, webapi::LocalTrackManager, widget::{icons, Border, Empty, MyWidgetExt}};
 
 use super::{icons::SvgIcon, theme};
 
@@ -224,6 +219,9 @@ impl<W: Widget<AppState>> Controller<AppState, W> for Authenticate {
             Event::Command(cmd) if cmd.is(Self::RESPONSE) => {
                 let result = cmd.get_unchecked(Self::RESPONSE);
                 let result = result.to_owned().map(|credentials| {
+                    let mut track_manager = LocalTrackManager::global().lock().unwrap();
+                    track_manager.read_new_user(credentials.get_username());
+                    drop(track_manager);
                     data.config.store_credentials(credentials);
                 });
                 data.preferences.auth.result.resolve_or_reject((), result);
