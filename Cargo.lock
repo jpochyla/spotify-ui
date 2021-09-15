@@ -414,6 +414,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "dark-light"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7120c3a2b4cbef379407b56cc808304a728cadc756605ab5f0b70619b4d44b9"
+dependencies = [
+ "winreg",
+]
+
+[[package]]
 name = "dbus"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -442,6 +451,12 @@ dependencies = [
  "adler32",
  "byteorder",
 ]
+
+[[package]]
+name = "detect-desktop-environment"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21d8ad60dd5b13a4ee6bd8fa2d5d88965c597c67bce32b5fc49c94f55cb50810"
 
 [[package]]
 name = "digest"
@@ -1627,6 +1642,8 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "crossbeam-channel",
+ "dark-light",
+ "detect-desktop-environment",
  "druid",
  "druid-shell",
  "env_logger 0.9.0",
@@ -2651,6 +2668,15 @@ checksum = "7c32753c378262520a4fa70c2e4389f4649e751faab2a887090567cff192d299"
 dependencies = [
  "syn",
  "windows_gen",
+]
+
+[[package]]
+name = "winreg"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d107f8c6e916235c4c01cabb3e8acf7bea8ef6a63ca2e7fa0527c049badfc48c"
+dependencies = [
+ "winapi 0.3.9",
 ]
 
 [[package]]

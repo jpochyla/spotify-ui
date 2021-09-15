@@ -44,7 +44,7 @@ pub fn main_window() -> WindowDesc<AppState> {
 }
 
 pub fn preferences_window() -> WindowDesc<AppState> {
-    let win_size = (theme::grid(50.0), theme::grid(45.0));
+    let win_size = (theme::grid(50.0), theme::grid(50.0));
 
     // On Windows, the window size includes the titlebar.
     let win_size = if cfg!(target_os = "windows") {
