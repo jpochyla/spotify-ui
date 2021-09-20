@@ -194,7 +194,37 @@ pub enum Theme {
 }
 
 impl Default for Theme {
+    #[cfg(not(target_os = "macos"))]
     fn default() -> Self {
-        Self::Light
+        Self::Dark
+    }
+
+    #[cfg(target_os = "macos")]
+    fn default() -> Self {
+        use cocoa::appkit::NSApp;
+        use cocoa::base::{id, nil};
+        use cocoa::foundation::{NSArray, NSAutoreleasePool};
+        use objc::rc::autoreleasepool;
+        use objc::{msg_send, sel, sel_impl};
+
+        #[link(name = "AppKit", kind = "framework")]
+        extern "C" {
+            static NSAppearanceNameAqua: id;
+            static NSAppearanceNameDarkAqua: id;
+        }
+
+        autoreleasepool(|| unsafe {
+            let app = NSApp();
+            let names =
+                NSArray::arrayWithObjects(nil, &[NSAppearanceNameAqua, NSAppearanceNameDarkAqua])
+                    .autorelease();
+            let appearance: id = msg_send![app, effectiveAppearance];
+            let best_match: id = msg_send![appearance, bestMatchFromAppearancesWithNames: names];
+            if best_match == NSAppearanceNameDarkAqua {
+                Self::Dark
+            } else {
+                Self::Light
+            }
+        })
     }
 }

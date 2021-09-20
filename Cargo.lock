@@ -1626,6 +1626,7 @@ name = "psst-gui"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "cocoa",
  "crossbeam-channel",
  "druid",
  "druid-shell",
@@ -1634,6 +1635,7 @@ dependencies = [
  "itertools",
  "log",
  "lru-cache",
+ "objc",
  "once_cell",
  "open",
  "platform-dirs",
