@@ -1,0 +1,25 @@
+name: Packaging
+on:
+  push:
+    branches: [master]
+  pull_request:
+jobs:
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:gnome-40
+      options: --privileged
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
+      with:
+        bundle: psst.flatpak
+        manifest-path: .pkg/FLATPAK/com.github.jpochyla.Psst.yaml
+        cache-key: flatpak-builder-${{ github.sha }}
