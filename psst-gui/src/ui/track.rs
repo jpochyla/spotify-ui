@@ -227,7 +227,7 @@ pub fn track_menu(
         let more_than_one_artist = track.artists.len() > 1;
         let title = if more_than_one_artist {
             LocalizedString::new("menu-item-show-artist-name")
-                .with_placeholder(format!("Go to Artist “{}”", artist_link.name))
+                .with_placeholder(format!("Go to Artist {}", artist_link.name))
         } else {
             LocalizedString::new("menu-item-show-artist").with_placeholder("Go to Artist")
         };
