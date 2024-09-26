@@ -21,7 +21,7 @@ fn add_windows_icon() {
     res.compile().expect("Could not attach exe icon");
 
     fn load_images() -> Vec<IcoFrame<'static>> {
-        let sizes = vec![32, 64, 128, 256];
+        let sizes = [32, 64, 128, 256];
         sizes
             .iter()
             .map(|s| {

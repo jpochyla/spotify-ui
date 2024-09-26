@@ -54,6 +54,11 @@ pub const ADD_TO_QUEUE: Selector<(QueueEntry, PlaybackItem)> = Selector::new("ap
 pub const PLAY_QUEUE_BEHAVIOR: Selector<QueueBehavior> = Selector::new("app.play-queue-behavior");
 pub const PLAY_SEEK: Selector<f64> = Selector::new("app.play-seek");
 
+// Queue control
+pub const REMOVE_FROM_QUEUE: Selector<usize> = Selector::new("app.remove-from-queue");
+pub const CLEAR_QUEUE: Selector = Selector::new("app.clear-queue");
+pub const SKIP_TO_PLACE_IN_QUEUE: Selector<usize> = Selector::new("app.skip-to-place-in-queue");
+
 // Sorting control
 pub const SORT_BY_DATE_ADDED: Selector = Selector::new("app.sort-by-date-added");
 pub const SORT_BY_TITLE: Selector = Selector::new("app.sort-by-title");

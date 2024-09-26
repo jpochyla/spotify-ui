@@ -82,7 +82,14 @@ pub struct AppState {
     pub home_detail: HomeDetail,
     pub alerts: Vector<Alert>,
     pub finder: Finder,
-    pub added_queue: Vector<QueueEntry>,
+    pub added_queue: QueueFields,
+}
+
+#[derive(Clone, Data, Lens)]
+pub struct QueueFields {
+    pub queue: Vector<QueueEntry>,
+    // TODO: This is a problem, due to added_queue never changing, the origin of a song, if also once added to the queue, will always be the queue.
+    pub displayed_queue: Vector<QueueEntry>,
 }
 
 impl AppState {
@@ -122,7 +129,10 @@ impl AppState {
                 cache_size: Promise::Empty,
             },
             playback,
-            added_queue: Vector::new(),
+            added_queue: QueueFields {
+                queue: Vector::new(),
+                displayed_queue: Vector::new(),
+            },
             search: Search {
                 input: "".into(),
                 results: Promise::Empty,
@@ -193,7 +203,7 @@ impl AppState {
 impl AppState {
     pub fn queued_entry(&self, item_id: ItemId) -> Option<QueueEntry> {
         if let Some(queued) = self
-            .playback
+            .added_queue
             .queue
             .iter()
             .find(|queued| queued.item.id() == item_id)
@@ -201,7 +211,8 @@ impl AppState {
         {
             Some(queued)
         } else if let Some(queued) = self
-            .added_queue
+            .playback
+            .queue
             .iter()
             .find(|queued| queued.item.id() == item_id)
             .cloned()
@@ -213,7 +224,8 @@ impl AppState {
     }
 
     pub fn add_queued_entry(&mut self, queue_entry: QueueEntry) {
-        self.added_queue.push_back(queue_entry);
+        self.added_queue.queue.push_back(queue_entry.clone());
+        self.added_queue.displayed_queue.push_back(queue_entry);
     }
 
     pub fn loading_playback(&mut self, item: Playable, origin: PlaybackOrigin) {

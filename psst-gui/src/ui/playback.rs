@@ -10,7 +10,7 @@ use druid::{
 use itertools::Itertools;
 
 use crate::{
-    cmd::{self, ADD_TO_QUEUE},
+    cmd::{self},
     controller::PlaybackController,
     data::{
         AppState, AudioAnalysis, Episode, NowPlaying, Playable, PlayableMatcher, Playback,
@@ -37,9 +37,6 @@ pub fn panel_widget() -> impl Widget<AppState> {
         .with_child(BarLayout::new(item_info, controls))
         .lens(AppState::playback)
         .controller(PlaybackController::new())
-        .on_command(ADD_TO_QUEUE, |_, _, data| {
-            data.info_alert("Track added to queue.")
-        })
 }
 
 fn playing_item_widget() -> impl Widget<NowPlaying> {
@@ -105,7 +102,9 @@ fn playing_item_widget() -> impl Widget<NowPlaying> {
                     .with_spacer(2.0)
                     .with_child(origin)
                     .on_click(|ctx, now_playing, _| {
-                        ctx.submit_command(cmd::NAVIGATE.with(now_playing.origin.to_nav()));
+                        if now_playing.origin.to_string() != PlaybackOrigin::Queue.to_string() {
+                            ctx.submit_command(cmd::NAVIGATE.with(now_playing.origin.to_nav()));
+                        }
                     })
                     .context_menu(|now_playing| match &now_playing.item {
                         Playable::Track(track) => track::track_menu(
@@ -174,6 +173,7 @@ fn playback_origin_icon(origin: &PlaybackOrigin) -> &'static SvgIcon {
     match origin {
         PlaybackOrigin::Home => &icons::HOME,
         PlaybackOrigin::Library => &icons::HEART,
+        PlaybackOrigin::Queue => &icons::PLAYLIST,
         PlaybackOrigin::Album { .. } => &icons::ALBUM,
         PlaybackOrigin::Artist { .. } => &icons::ARTIST,
         PlaybackOrigin::Playlist { .. } => &icons::PLAYLIST,

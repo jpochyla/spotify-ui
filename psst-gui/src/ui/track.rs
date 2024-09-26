@@ -337,7 +337,7 @@ pub fn track_menu(
         .command(cmd::ADD_TO_QUEUE.with((
             QueueEntry {
                 item: crate::ui::Playable::Track(track.clone()),
-                origin: origin.clone(),
+                origin: PlaybackOrigin::Queue,
             },
             PlaybackItem {
                 item_id: ItemId::from_base62(&String::from(track.id), ItemIdType::Track).unwrap(),
