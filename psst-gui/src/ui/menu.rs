@@ -5,8 +5,8 @@ use crate::{
     data::{AppState, Nav},
 };
 
-pub fn main_menu(_window: Option<WindowId>, _data: &AppState, _env: &Env) -> Menu<AppState> {
-    if cfg!(target_os = "macos") {
+pub fn main_menu(_window: Option<WindowId>, data: &AppState, _env: &Env) -> Menu<AppState> {
+    if cfg!(target_os = "macos") && !data.config.kiosk_mode {
         Menu::empty().entry(mac_app_menu())
     } else {
         Menu::empty()

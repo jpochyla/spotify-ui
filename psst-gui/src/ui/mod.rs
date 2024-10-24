@@ -4,6 +4,7 @@ use druid::{
     im::Vector,
     widget::{CrossAxisAlignment, Either, Flex, Label, List, Scroll, Slider, Split, ViewSwitcher},
     Color, Env, Insets, Key, LensExt, Menu, MenuItem, Selector, Widget, WidgetExt, WindowDesc,
+    WindowState,
 };
 use druid_shell::Cursor;
 
@@ -43,12 +44,30 @@ pub mod user;
 pub mod utils;
 
 pub fn main_window(config: &Config) -> WindowDesc<AppState> {
-    let win = WindowDesc::new(root_widget())
+    let mut win = WindowDesc::new(root_widget(config))
         .title(compute_main_window_title)
-        .with_min_size((theme::grid(65.0), theme::grid(50.0)))
-        .window_size(config.window_size)
-        .show_title(false)
-        .transparent_titlebar(true);
+        .show_title(false);
+
+    if config.kiosk_mode {
+        win = win
+            .set_window_state(WindowState::Maximized)
+            .resizable(false)
+            .show_titlebar(false);
+
+        // Set the window size to the primary monitor's work area and position it at (0, 0)
+        if let Some(monitor) = druid::Screen::get_monitors().first() {
+            let work_area = monitor.virtual_work_rect();
+            win = win
+                .window_size(work_area.size())
+                .set_position(druid::Point::new(0.0, 0.0));
+        }
+    } else {
+        win = win
+            .window_size(config.window_size)
+            .with_min_size((theme::grid(65.0), theme::grid(50.0)))
+            .transparent_titlebar(true);
+    }
+
     if cfg!(target_os = "macos") {
         win.menu(menu::main_menu)
     } else {
@@ -72,6 +91,7 @@ pub fn preferences_window() -> WindowDesc<AppState> {
         .window_size(win_size)
         .resizable(false)
         .show_title(false)
+        .set_always_on_top(true)
         .transparent_titlebar(true);
     if cfg!(target_os = "macos") {
         win.menu(menu::main_menu)
@@ -83,9 +103,23 @@ pub fn preferences_window() -> WindowDesc<AppState> {
 pub fn account_setup_window() -> WindowDesc<AppState> {
     let win = WindowDesc::new(account_setup_widget())
         .title("Login")
-        .window_size((theme::grid(50.0), theme::grid(45.0)))
         .resizable(false)
         .show_title(false)
+        .window_size((theme::grid(50.0), theme::grid(45.0)))
+        .transparent_titlebar(true);
+    if cfg!(target_os = "macos") {
+        win.menu(menu::main_menu)
+    } else {
+        win
+    }
+}
+
+pub fn kiosk_setup_window() -> WindowDesc<AppState> {
+    let win = WindowDesc::new(kiosk_setup_widget())
+        .title("Setup")
+        .resizable(false)
+        .show_title(false)
+        .window_size((theme::grid(50.0), theme::grid(45.0)))
         .transparent_titlebar(true);
     if cfg!(target_os = "macos") {
         win.menu(menu::main_menu)
@@ -110,7 +144,15 @@ fn account_setup_widget() -> impl Widget<AppState> {
     )
 }
 
-fn root_widget() -> impl Widget<AppState> {
+fn kiosk_setup_widget() -> impl Widget<AppState> {
+    ThemeScope::new(
+        preferences::kiosk_setup_widget()
+            .background(theme::BACKGROUND_DARK)
+            .expand(),
+    )
+}
+
+fn root_widget(config: &Config) -> impl Widget<AppState> {
     let playlists = Scroll::new(playlist::list_widget())
         .vertical()
         .expand_height();
@@ -120,8 +162,8 @@ fn root_widget() -> impl Widget<AppState> {
         .with_child(sidebar_menu_widget())
         .with_default_spacer()
         .with_flex_child(playlists, 1.0)
-        .padding(if cfg!(target_os = "macos") {
-            // Accommodate the window controls on Mac.
+        .padding(if cfg!(target_os = "macos") && !config.kiosk_mode {
+            // Accommodate the window controls on macOS
             Insets::new(0.0, 24.0, 0.0, 0.0)
         } else {
             Insets::ZERO

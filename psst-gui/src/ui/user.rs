@@ -7,7 +7,10 @@ use druid::{
 use crate::{
     data::{AppState, Library, UserProfile},
     webapi::WebApi,
-    widget::{icons, icons::SvgIcon, Async, Empty, MyWidgetExt},
+    widget::{
+        icons::{self, SvgIcon},
+        Async, Empty, MyWidgetExt,
+    },
 };
 
 use super::theme;
@@ -51,7 +54,11 @@ pub fn user_widget() -> impl Widget<AppState> {
                 .with_child(user_profile)
                 .padding(theme::grid(1.0)),
         )
-        .with_child(preferences_widget(&icons::PREFERENCES))
+        .with_child(Either::new(
+            |data: &AppState, _| !data.config.kiosk_mode,
+            preferences_widget(&icons::PREFERENCES),
+            Empty,
+        ))
 }
 
 fn preferences_widget<T: Data>(svg: &SvgIcon) -> impl Widget<T> {

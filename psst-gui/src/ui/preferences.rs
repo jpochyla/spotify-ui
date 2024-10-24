@@ -47,6 +47,29 @@ pub fn account_setup_widget() -> impl Widget<AppState> {
         .padding(theme::grid(4.0))
 }
 
+pub fn kiosk_setup_widget() -> impl Widget<AppState> {
+    Flex::column()
+        .must_fill_main_axis(true)
+        .cross_axis_alignment(CrossAxisAlignment::Start)
+        .with_spacer(theme::grid(2.0))
+        .with_child(
+            Label::new("Please insert your Spotify Premium credentials.")
+                .with_font(theme::UI_FONT_MEDIUM)
+                .with_line_break_mode(LineBreaking::WordWrap),
+        )
+        .with_spacer(theme::grid(2.0))
+        .with_child(
+            Label::new(
+                "Psst connects only to the official servers, and does not store your password.",
+            )
+            .with_text_color(theme::PLACEHOLDER_COLOR)
+            .with_line_break_mode(LineBreaking::WordWrap),
+        )
+        .with_spacer(theme::grid(6.0))
+        .with_child(account_tab_widget(AccountTab::KioskSetup).expand_width())
+        .padding(theme::grid(4.0))
+}
+
 pub fn preferences_widget() -> impl Widget<AppState> {
     const PROPAGATE_FLAGS: Selector = Selector::new("app.preferences.propagate-flags");
 
@@ -247,6 +270,12 @@ fn general_tab_widget() -> impl Widget<AppState> {
                 .lens(AppState::config.then(Config::paginated_limit)),
         );
 
+    col = col.with_default_spacer().with_child(
+        Button::new("Done")
+            .align_right()
+            .on_click(|ctx, _, _| ctx.submit_command(commands::CLOSE_WINDOW)),
+    );
+
     col
 }
 
@@ -254,12 +283,14 @@ fn general_tab_widget() -> impl Widget<AppState> {
 enum AccountTab {
     FirstSetup,
     InPreferences,
+    KioskSetup,
 }
 
 fn account_tab_widget(tab: AccountTab) -> impl Widget<AppState> {
     let mut col = Flex::column().cross_axis_alignment(match tab {
         AccountTab::FirstSetup => CrossAxisAlignment::Center,
         AccountTab::InPreferences => CrossAxisAlignment::Start,
+        AccountTab::KioskSetup => CrossAxisAlignment::Start,
     });
 
     if matches!(tab, AccountTab::InPreferences) {
@@ -293,9 +324,16 @@ fn account_tab_widget(tab: AccountTab) -> impl Widget<AppState> {
         );
 
     if matches!(tab, AccountTab::InPreferences) {
-        col = col.with_child(Button::new("Log Out").on_left_click(|ctx, _, _, _| {
-            ctx.submit_command(cmd::LOG_OUT);
-        }))
+        col = col
+            .with_child(Button::new("Log Out").on_left_click(|ctx, _, _, _| {
+                ctx.submit_command(cmd::LOG_OUT);
+            }))
+            .with_default_spacer()
+            .with_child(
+                Button::new("Done")
+                    .align_right()
+                    .on_click(|ctx, _, _| ctx.submit_command(commands::CLOSE_WINDOW)),
+            )
     }
 
     col.controller(Authenticate::new(tab))
@@ -391,6 +429,11 @@ impl<W: Widget<AppState>> Controller<AppState, W> for Authenticate {
                         AccountTab::InPreferences => {
                             ctx.submit_command(cmd::SESSION_CONNECT);
                         }
+                        AccountTab::KioskSetup => {
+                            ctx.submit_command(commands::CLOSE_WINDOW);
+                            ctx.submit_command(commands::SHOW_PREFERENCES);
+                            ctx.submit_command(cmd::SHOW_MAIN);
+                        }
                     }
                 }
                 data.preferences.auth.access_token.clear();
@@ -442,6 +485,11 @@ fn cache_tab_widget() -> impl Widget<AppState> {
                 }
             },
         ));
+    col = col.with_default_spacer().with_child(
+        Button::new("Done")
+            .align_right()
+            .on_click(|ctx, _, _| ctx.submit_command(commands::CLOSE_WINDOW)),
+    );
 
     col.controller(MeasureCacheSize::new())
         .lens(AppState::preferences)
@@ -534,4 +582,10 @@ fn about_tab_widget() -> impl Widget<AppState> {
         .with_child(commit_hash)
         .with_child(build_time)
         .with_child(remote_url)
+        .with_default_spacer()
+        .with_child(
+            Button::new("Done")
+                .align_right()
+                .on_click(|ctx, _, _| ctx.submit_command(commands::CLOSE_WINDOW)),
+        )
 }

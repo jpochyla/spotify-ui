@@ -102,6 +102,7 @@ pub struct Config {
     pub sort_criteria: SortCriteria,
     pub paginated_limit: usize,
     pub seek_duration: usize,
+    pub kiosk_mode: bool,
 }
 
 impl Default for Config {
@@ -120,6 +121,7 @@ impl Default for Config {
             sort_criteria: Default::default(),
             paginated_limit: 500,
             seek_duration: 10,
+            kiosk_mode: false,
         }
     }
 }
