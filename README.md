@@ -1,17 +1,79 @@
-# Psst
-
-A fast Spotify client with a native GUI written in Rust, without Electron.
-Psst is still very early in development, lacking in features, stability, and general user experience.
-It's fully cross-platform, supporting Windows, Linux, and macOS.
-Contributions are welcome!
-
-**Note:** A Spotify Premium account is required.
-
+<a id="readme-top"></a>
 [![Build](https://github.com/jpochyla/psst/actions/workflows/build.yml/badge.svg)](https://github.com/jpochyla/psst/actions)
 
-![Screenshot](./psst-gui/assets/screenshot.png)
 
-## Download
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/jpochyla/psst">
+    <img src="psst-gui/assets/logo_128.png" alt="Logo" width="80" height="80">
+  </a>
+
+<h3 align="center">Psst</h3>
+
+  <p align="center">
+    A fully cross-platform, fast Spotify client with a native GUI written in Rust, without Electron.
+    <br />
+    <b> A Spotify Premium account is required. </b>
+    <br />
+    <br />
+    <a href="#builds">Download</a>
+    ·
+    <a href="https://github.com/github_username/repo_name/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    ·
+    <a href="https://github.com/github_username/repo_name/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#builds">Download</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+[![Product Name Screen Shot][product-screenshot]](https://example.com)
+
+Psst is a fast and mult-platform Spotify client, it is still under active development and big new features are on thir way, however, this means that stability and general user expereince may be limited. It is written in rust and uses the UI framework Druid. 
+Contributions are welcome!
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+### Builds
 
 GitHub Actions automatically creates builds when new commits are pushed to the `main` branch.
 You can download the prebuilt binaries for x86_64 Windows, Linux (Ubuntu), and macOS.
@@ -27,7 +89,10 @@ You can download the prebuilt binaries for x86_64 Windows, Linux (Ubuntu), and m
 
 Unofficial builds of Psst are also available through the [AUR](https://aur.archlinux.org/packages/psst-git) and [Homebrew](https://formulae.brew.sh/cask/psst).
 
-## Building
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Prerequisites
 
 On all platforms, the **latest [Rust](https://rustup.rs/) stable** (at least 1.65.0) is required.
 For platform-specific requirements, see the dropdowns below.
@@ -86,99 +151,146 @@ ulimit -d $(( 2 * `ulimit -d` ))
 
 ---
 
-#### Build from Source:
+### Installation
 
+1. Clone the repo
+```shell
+git clone https://github.com/jpochyla/psst.git
+```
+
+3. Build from Source
 ```shell
 cargo build
 # Append `--release` for a release build.
 ```
 
-#### Run from Source:
-
+4. Run from Source:
 ```shell
 cargo run --bin psst-gui
 # Append `--release` for a release build.
 ```
 
-#### Build Installation Bundle (i.e., macOS .app):
-
+5. Build Installation Bundle (i.e., macOS .app):
 ```shell
 cargo install cargo-bundle
 cargo bundle --release
 ```
 
+6. Change git remote url to avoid accidental pushes to base project
+ ```sh
+ git remote set-url origin github_username/repo_name
+ git remote -v # confirm the changes
+ ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ROADMAP -->
 ## Roadmap
 
-- [x] Vorbis track playback
-- [x] Browsing saved albums and tracks
-- [x] Save / unsave albums and tracks
-- [x] Browsing followed playlists
-- [x] Search for artists, albums, and tracks
-- [x] Podcast support
-- [x] Media keys control
-- [x] Open Spotify links through the search bar
-- [x] Audio volume control
-- [x] Audio loudness normalization
-- [x] Genre playlists and "For You" content
-- [x] Dark theme
-- [ ] Resilience to network errors (automatically retry timed-out requests)
-- [ ] Managing playlists
-  - Follow/unfollow
-  - Add/remove tracks
-  - Reorder tracks
-  - Rename playlist
-  - Playlist folders
-- [x] Playback queue
-- [ ] React to audio output device events
-  - Pause after disconnecting headphones
-  - Transfer playback after connecting headphones
-- [ ] Better caching
-  - Cache as many WebAPI responses as possible
-  - Visualize cache utilization
-    - Total cache usage in the config dialog
-    - Show time origin of cached data, allow to refresh
-- [ ] Trivia on the artist page, Wikipedia links
-- [ ] Downloading encrypted tracks
-- [ ] Reporting played tracks to Spotify servers
-- [ ] OS-specific application bundles
-- UI
-  - [ ] Rethink the current design, consider a two-pane layout
-    - Left pane for browsing
-    - Right pane for current playback
-  - [ ] Detect light/dark OS theme
-  - [ ] Robust error states, ideally with a retry button
-  - [ ] Correct playback highlight
-    - Highlight now-playing track only in the correct album/playlist
-    - Keep highlighted track in viewport
-  - [ ] Paging or virtualized lists for albums and tracks
-  - [ ] Grid for albums and artists
-  - [ ] Robust active/inactive menu visualization
-  - [ ] Save playback state
+- [ ] Feature 1
+- [ ] Feature 2
+- [ ] Feature 3
+    - [ ] Nested Feature
 
-## Development
+See the [open issues](https://github.com/jpochyla/psst/issues) for a full list of proposed features (and known issues).
 
-Contributions are very welcome!  
-Here's the basic project structure:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-- `/psst-core` - Core library, takes care of Spotify TCP session, audio file retrieval, decoding, audio output, playback queue, etc.
-- `/psst-gui` - GUI application built with [Druid](https://github.com/linebender/druid)
-- `/psst-cli` - Example CLI that plays a track. Credentials must be configured in the code.
-- `/psst-protocol` - Internal Protobuf definitions used for Spotify communication.
 
-## Privacy Policy
 
-Psst connects only to the official Spotify servers and does not call home.
-Caches of various things are stored locally and can be deleted anytime.
-User credentials are not stored at all; instead, a re-usable authentication token from Spotify is used.
+<!-- CONTRIBUTING -->
+## Contributing
 
-## Thanks
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-This project would not exist without the following:
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
 
-- Big thank you to [`librespot`](https://github.com/librespot-org/librespot), the Open Source Spotify client library for Rust. Most of `psst-core` is directly inspired by the ideas and code of `librespot`, although with a few differences:
-  - Spotify Connect (remote control) is not supported yet.
-  - Psst is completely synchronous, without `tokio` or other `async` runtime, although it will probably change in the future.
-  - Psst is using HTTPS-based CDN audio file retrieval, similar to the official Web client or [`librespot-java`](https://github.com/librespot-org/librespot-java), instead of the channel-based approach in `librespot`.
-- [`druid`](https://github.com/linebender/druid) native GUI library for Rust.
-- [`ncspot`](https://github.com/hrkfdn/ncspot) cross-platform ncurses Spotify client written in Rust, using `librespot`.
-- ...and of course other libraries and projects.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Top contributors:
+
+<a href="https://github.com/github_username/jpochyla/psst/contributors">
+  <img src="https://contrib.rocks/image?repo=jpochyla/psst" alt="contrib.rocks image" />
+</a>
+
+
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+
+Project Link: [https://github.com/github_username/repo_name](https://github.com/jpochyla/psst)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* []()
+* []()
+* []()
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/jpochyla/psst.svg?style=for-the-badge
+[contributors-url]: https://github.com/jpochyla/psst/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/jpochyla/psst.svg?style=for-the-badge
+[forks-url]: https://github.com/jpochyla/psst/network/members
+[stars-shield]: https://img.shields.io/github/stars/jpochyla/psst.svg?style=for-the-badge
+[stars-url]: https://github.com/jpochyla/psst/stargazers
+[issues-shield]: https://img.shields.io/github/issues/jpochyla/psst.svg?style=for-the-badge
+[issues-url]: https://github.com/jpochyla/psst/issues
+[license-shield]: https://img.shields.io/github/license/jpochyla/psst.svg?style=for-the-badge
+[license-url]: https://github.com/jpochyla/psst/blob/master/LICENSE.txt
+
+[product-screenshot]: psst-gui/assets/screenshot.png
+[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
+[Next-url]: https://nextjs.org/
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
+[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[Vue-url]: https://vuejs.org/
+[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
+[Angular-url]: https://angular.io/
+[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
+[Svelte-url]: https://svelte.dev/
+[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
+[Laravel-url]: https://laravel.com
+[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
+[Bootstrap-url]: https://getbootstrap.com
+[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
+[JQuery-url]: https://jquery.com 
