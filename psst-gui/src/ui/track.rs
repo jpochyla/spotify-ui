@@ -52,8 +52,7 @@ impl Display {
 
 pub fn playable_widget(track: &Track, display: Display) -> impl Widget<PlayRow<Arc<Track>>> {
     let mut main_row = Flex::row();
-    let mut major = Flex::row();
-    let mut minor = Flex::row();
+    let mut metadata_column = Flex::column();
 
     if display.number {
         let track_number = Label::<Arc<Track>>::dynamic(|track, _| track.track_number.to_string())
@@ -63,17 +62,12 @@ pub fn playable_widget(track: &Track, display: Display) -> impl Widget<PlayRow<A
             .center()
             .fix_width(theme::grid(2.0))
             .lens(PlayRow::item);
-        major.add_child(track_number);
-        major.add_default_spacer();
-
-        // Align the bottom line content.
-        minor.add_spacer(theme::grid(2.0));
-        minor.add_default_spacer();
+        main_row.add_child(track_number);
     }
 
     if display.cover {
         let album_cover = rounded_cover_widget(theme::grid(4.0))
-            .padding_right(theme::grid(1.0)) // Instead of `add_default_spacer`.
+            .padding_right(theme::grid(1.0))
             .lens(PlayRow::item);
         main_row.add_child(Either::new(
             |row, _| row.ctx.show_track_cover,
@@ -82,39 +76,19 @@ pub fn playable_widget(track: &Track, display: Display) -> impl Widget<PlayRow<A
         ));
     }
 
-    if display.title {
-        let track_name = Label::raw()
-            .with_font(theme::UI_FONT_MEDIUM)
-            .lens(PlayRow::item.then(Track::name.in_arc()));
-        major.add_child(track_name);
-    }
-
-    if track.explicit && (display.artist || display.album) {
-        let icon = icons::EXPLICIT.scale(theme::ICON_SIZE_TINY);
-        minor.add_child(icon);
-        minor.add_spacer(theme::grid(0.5));
-    }
-
-    if display.artist {
-        let track_artists = Label::dynamic(|row: &PlayRow<Arc<Track>>, _| row.item.artist_names())
-            .with_text_size(theme::TEXT_SIZE_SMALL);
-        minor.add_child(track_artists);
-    }
-
-    if display.album {
-        let track_album = Label::raw()
-            .with_text_size(theme::TEXT_SIZE_SMALL)
-            .with_text_color(theme::PLACEHOLDER_COLOR)
-            .lens(PlayRow::item.then(Track::lens_album_name().in_arc()));
-        if display.artist {
-            minor.add_default_spacer();
-        }
-        minor.add_child(track_album);
-    }
-
-    let is_playing = playable::is_playing_marker_widget().lens(PlayRow::is_playing);
-    major.add_default_spacer();
-    major.add_flex_child(is_playing, 1.0);
+    let mut title_row = Flex::row()
+        .with_flex_child(
+            Label::raw()
+                .with_font(theme::UI_FONT_MEDIUM)
+                .with_line_break_mode(LineBreaking::Clip)
+                .lens(PlayRow::item.then(Track::name.in_arc()))
+                .expand_width(),
+            1.0,
+        )
+        .with_default_spacer()
+        // .with_child(playable::is_playing_marker_widget().lens(PlayRow::is_playing))
+        .with_default_spacer()
+        .must_fill_main_axis(true);
 
     if display.popularity {
         let track_popularity = Label::<Arc<Track>>::dynamic(|track, _| {
@@ -123,17 +97,51 @@ pub fn playable_widget(track: &Track, display: Display) -> impl Widget<PlayRow<A
         .with_text_size(theme::TEXT_SIZE_SMALL)
         .with_text_color(theme::PLACEHOLDER_COLOR)
         .lens(PlayRow::item);
-        major.add_default_spacer();
-        major.add_child(track_popularity);
+        title_row.add_child(track_popularity);
     }
 
     let track_duration =
         Label::<Arc<Track>>::dynamic(|track, _| utils::as_minutes_and_seconds(track.duration))
             .with_text_size(theme::TEXT_SIZE_SMALL)
             .with_text_color(theme::PLACEHOLDER_COLOR)
+            .fix_width(theme::grid(4.0))
             .lens(PlayRow::item);
-    major.add_default_spacer();
-    major.add_child(track_duration);
+
+    title_row.add_child(track_duration);
+
+    metadata_column.add_child(title_row);
+
+    // Album artist and album
+    let detail_row = Flex::row().with_flex_child(
+        Label::dynamic(move |row: &PlayRow<Arc<Track>>, _| {
+            let artist = if display.artist {
+                row.item.artist_names()
+            } else {
+                String::new()
+            };
+            let album = if display.album {
+                row.item
+                    .album
+                    .as_ref()
+                    .map_or(String::new(), |a| a.name.to_string())
+            } else {
+                String::new()
+            };
+            if !artist.is_empty() && !album.is_empty() {
+                format!("{} • {}", artist, album)
+            } else {
+                format!("{}{}", artist, album)
+            }
+        })
+        .with_line_break_mode(LineBreaking::Clip)
+        .with_text_size(theme::TEXT_SIZE_SMALL)
+        .with_text_color(theme::PLACEHOLDER_COLOR),
+        1.0,
+    );
+
+    metadata_column.add_child(detail_row);
+
+    main_row.add_flex_child(metadata_column, 1.0);
 
     let saved = ViewSwitcher::new(
         |row: &PlayRow<Arc<Track>>, _| row.ctx.library.saved_tracks.is_resolved(),
@@ -163,19 +171,8 @@ pub fn playable_widget(track: &Track, display: Display) -> impl Widget<PlayRow<A
     );
 
     main_row
-        .with_flex_child(
-            Flex::column()
-                .cross_axis_alignment(CrossAxisAlignment::Start)
-                .with_child(major)
-                .with_spacer(2.0)
-                .with_child(minor)
-                .on_left_click(|ctx, _, row, _| {
-                    ctx.submit_notification(cmd::PLAY.with(row.position))
-                }),
-            1.0,
-        )
-        .with_default_spacer()
         .with_child(saved)
+        .on_left_click(|ctx, _, row, _| ctx.submit_notification(cmd::PLAY.with(row.position)))
         .padding(theme::grid(1.0))
         .link()
         .active(|row: &PlayRow<Arc<Track>>, _env: &Env| {
@@ -239,7 +236,7 @@ pub fn track_menu(
         let more_than_one_artist = track.artists.len() > 1;
         let title = if more_than_one_artist {
             LocalizedString::new("menu-item-show-artist-name")
-                .with_placeholder(format!("Go to Artist “{}”", artist_link.name))
+                .with_placeholder(format!("Go to Artist {}", artist_link.name))
         } else {
             LocalizedString::new("menu-item-show-artist").with_placeholder("Go to Artist")
         };
