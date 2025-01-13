@@ -157,6 +157,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get full history to count number of commits for package version
 
       - name: Download Linux Binaries
         uses: actions/download-artifact@v4
@@ -190,14 +192,13 @@ jobs:
       - name: Move License
         run: mkdir -p ${{runner.workspace}}/pkg/usr/share/doc/psst-gui/; mv .pkg/copyright $_
 
-      - name: Move Package Config
+      - name: Write Package Config
         run: |
-          mkdir -p ${{runner.workspace}}/pkg/
-          cp -r .pkg/DEBIAN $_/
-          sed -i 's/Architecture: amd64/Architecture: ${{ matrix.arch }}/' ${{runner.workspace}}/pkg/DEBIAN/control
-
-      - name: Set Version
-        run: "echo Version: $(git rev-list --count HEAD) >> ${{runner.workspace}}/pkg/DEBIAN/control"
+          mkdir -p ${{runner.workspace}}/pkg/DEBIAN
+          export ARCHITECTURE=${{ matrix.arch }}
+          SANITIZED_BRANCH="$(echo ${GITHUB_HEAD_REF:+.$GITHUB_HEAD_REF}|tr '_/' '-')"
+          export VERSION=0.1.0"$SANITIZED_BRANCH"+r"$(git rev-list --count HEAD)"-0
+          envsubst < .pkg/DEBIAN/control > ${{runner.workspace}}/pkg/DEBIAN/control
 
       - name: Build Package
         run: |
