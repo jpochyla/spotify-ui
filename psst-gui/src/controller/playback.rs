@@ -192,31 +192,25 @@ impl PlaybackController {
 
     fn update_media_control_metadata(&mut self, playback: &Playback) {
         if let Some(media_controls) = self.media_controls.as_mut() {
-            let title = playback.now_playing.as_ref().map(|p| p.item.name().clone());
-            let album = playback
-                .now_playing
-                .as_ref()
-                .and_then(|p| p.item.track())
-                .map(|t| t.album_name());
-            let artist = playback
-                .now_playing
-                .as_ref()
-                .and_then(|p| p.item.track())
-                .map(|t| t.artist_name());
-            let duration = playback.now_playing.as_ref().map(|p| p.item.duration());
-            let cover_url = playback
-                .now_playing
-                .as_ref()
-                .and_then(|p| p.cover_image_url(512.0, 512.0));
-            media_controls
-                .set_metadata(MediaMetadata {
-                    title: title.as_deref(),
-                    album: album.as_deref(),
+            if let Some(now_playing) = &playback.now_playing {
+                let title = now_playing.item.name();
+                let album = now_playing
+                    .item
+                    .track()
+                    .and_then(|t| t.album.as_ref().map(|a| &a.name));
+                let artist = now_playing.item.track().map(|t| t.artist_name());
+                let duration = now_playing.item.duration();
+                let cover_url = now_playing.cover_image_url(512.0, 512.0);
+
+                let metadata = MediaMetadata {
+                    title: Some(title.as_ref()),
+                    album: album.map(|a| a.as_ref()),
                     artist: artist.as_deref(),
-                    duration,
+                    duration: Some(duration),
                     cover_url,
-                })
-                .unwrap();
+                };
+                media_controls.set_metadata(metadata).unwrap();
+            }
         }
     }
 
