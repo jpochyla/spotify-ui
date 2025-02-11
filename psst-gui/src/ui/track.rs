@@ -154,7 +154,8 @@ pub fn playable_widget(track: &Track, display: Display) -> impl Widget<PlayRow<A
                 if row.ctx.library.contains_track(track) {
                     ctx.submit_command(library::UNSAVE_TRACK.with(track.id))
                 } else {
-                    ctx.submit_command(library::SAVE_TRACK.with(track.clone()))
+                    ctx.submit_command(library::SAVE_TRACK.with(track.clone()));
+                    ctx.submit_command(library::LOAD_TRACKS);
                 }
             })
             .boxed(),
