@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.github.jpochyla.Psst</id>
+  <url type="homepage">https://github.com/jpochyla/psst</url>
+
+  <name>Psst</name>
+  <summary>Fast Spotify client with native GUI, without Electron, built in Rust.</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+
+  <description>
+    <p>
+      Fast Spotify client with native GUI, without Electron, built in Rust. Very early in development, lacking in features, stability, and general user experience. It is being tested only on Mac so far, but aims for full Windows and Linux support. Contributions welcome!
+    </p>
+  </description>
+
+  <launchable type="desktop-id">com.github.jpochyla.Psst.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/jpochyla/psst/master/psst-gui/assets/screenshot.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="master" date="2021-08-23"/>
+  </releases>
+</component>
